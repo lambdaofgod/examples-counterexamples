@@ -5,7 +5,10 @@
 
 import os
 import load_data_utils
+
 from skimage.io import imread_collection, concatenate_images
+
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -30,6 +33,9 @@ def load_images():
     return reshaped_images 
 
 
+# plotting utils
+
+
 def display_image(img, **kwds):
     """
     input:
@@ -41,3 +47,25 @@ def display_image(img, **kwds):
     plt.imshow(tmp_img, **kwds)
     plt.show()
 
+def signed_scatterplot(images, labels, label_names):
+
+  colors = ['xkcd:neon green',
+          'lightcoral',
+          'xkcd:turtle green', 
+          'xkcd:cobalt', 
+          'xkcd:dusky pink', 
+          'xkcd:lighter purple', 
+          'xkcd:light cyan', 
+          'xkcd:khaki', 
+          'xkcd:green yellow', 
+          'xkcd:purple gray', 
+          'xkcd:very light blue', 
+          'xkcd:buff',
+          'xkcd:mushroom']
+
+  def plts(images):
+    for c in np.unique(labels):
+      idxs = labels == c
+      yield plt.scatter(images[idxs, 0], images[idxs, 1], c=colors[c])
+      
+  plt.legend(plts(images), label_names)
