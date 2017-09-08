@@ -27,8 +27,6 @@ COLORS = ['xkcd:neon green',
       'xkcd:mushroom']
 
 
-
-
 def load_images():
     """
     Return COIL-20 images
@@ -66,9 +64,21 @@ def display_image(img, **kwds):
 
 
 def signed_scatterplot(images, labels, label_names):
-  def plts(images):
-    for c in np.unique(labels):
-      idxs = labels == c
-      yield plt.scatter(images[idxs, 0], images[idxs, 1], c=COLORS[c])
+    def plts(images):
+        for c in np.unique(labels):
+            idxs = labels == c
+            yield plt.scatter(images[idxs, 0], images[idxs, 1], c=COLORS[c])
       
-  plt.legend(plts(images), label_names)
+    plt.legend(plts(images), label_names)
+
+
+def rotation_trajectories_scatterplot(images, labels, label_names):
+    signed_scatterplot(images, labels, label_names)
+
+    for l in np.unique(labels):
+        idxs = labels == l
+        l_imgs = images[idxs, :]
+        for v1, v2 in zip(list(l_imgs[:-1]), list(l_imgs[1:])):
+            plt.plot([v1[0], v2[0]], [v1[1], v2[1]], c=COLORS[l])
+            v_first, v_last = l_imgs[0], l_imgs[-1]
+        plt.plot([v_first[0], v_last[0]], [v_first[1], v_last[1]], c=COLORS[l])
