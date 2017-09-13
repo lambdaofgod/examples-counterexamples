@@ -38,7 +38,7 @@ def load_images():
     (1440 flattened 128x128 images)
     """
     COIL20_SUFFIX = 'coil-20-proc'
-    __, DATA_DIR = load_data_utils.get_env_vars()
+    __, DATA_DIR = load_data_utils.get_env_vars(go_up=True)
     COIL20_DIR = DATA_DIR + '/' +  COIL20_SUFFIX
     
     image_list =  imread_collection(COIL20_DIR + '/*.png')
