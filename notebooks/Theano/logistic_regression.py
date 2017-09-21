@@ -155,45 +155,19 @@ class LogisticRegression:
     gradient descent updates
     """
     
-    # gradients
-    gW = T.grad(cost=loss, wrt=W)
-    gB = T.grad(cost=loss, wrt=B)
-      
-    updates = [
-      (W, W - learning_rate * gW),
-      (B, B - learning_rate * gB)]
-    return updates
+    return ([gradient_descent_update(loss, weights, learning_rate)
+            for weights in [W, B]])
 
   
   def __momentum_updates(loss, W, B, learning_rate, momentum):
     """
     gradient descent with momentum updates
     """
-   
-    # gradients
-    gW = T.grad(cost=loss, wrt=W)
-    gB = T.grad(cost=loss, wrt=B)
     
-    # momentum tensor
-    velocity_W = theano.shared(
-      value=np.zeros(
-        W.get_value().shape,
-        dtype=theano.config.floatX),
-      name='velocity_W',
-      borrow=True)
-    
-    velocity_B = theano.shared(
-      value=np.zeros(
-        B.get_value().shape,
-        dtype=theano.config.floatX),
-      name='velocity_B',
-      borrow=True)
-    
-    updates = [
-      (velocity_W, momentum * velocity_W - learning_rate * gW),
-      (velocity_B, momentum * velocity_B - learning_rate * gB),
-      (W, W + velocity_W),
-      (B, B + velocity_B)]
+    updates = sum([
+      momentum_method_updates(loss, weights, learning_rate, momentum)
+      for weights in [W, B]],
+      [])
     return updates
 
   
@@ -217,3 +191,4 @@ class LogisticRegression:
     self.losses = np.array(self.losses)
   
     self.is_fitted = True
+
