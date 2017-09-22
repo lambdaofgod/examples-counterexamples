@@ -6,7 +6,7 @@ import theano.tensor as T
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import accuracy_score 
 
-from updates import gradient_descent_update, momentum_method_updates
+from updates import *
 
 
 class LogisticRegression:
@@ -188,6 +188,14 @@ class LogisticRegression:
                 self.thB,
                 learning_rate,
                 momentum)
+        elif optimization_method == 'nesterov':
+            momentum = optimization_params['decay']
+            return LogisticRegression.__nesterov_updates(
+                self.loss,
+                self.thW,
+                self.thB,
+                learning_rate,
+                momentum)
         else:
             raise NotImplementedError("method {} is not implemented".format(optimization_method))
     
@@ -199,7 +207,7 @@ class LogisticRegression:
         return ([gradient_descent_update(loss, weights, learning_rate)
                         for weights in [W, B]])
 
-    
+
     def __momentum_updates(loss, W, B, learning_rate, momentum):
         """
         gradient descent with momentum updates
@@ -207,6 +215,18 @@ class LogisticRegression:
         
         updates = sum([
             momentum_method_updates(loss, weights, learning_rate, momentum)
+            for weights in [W, B]],
+            [])
+        return updates
+
+    
+    def __nesterov_updates(loss, W, B, learning_rate, momentum):
+        """
+        gradient descent with momentum updates
+        """
+        
+        updates = sum([
+            nesterov_method_updates(loss, weights, learning_rate, momentum)
             for weights in [W, B]],
             [])
         return updates
