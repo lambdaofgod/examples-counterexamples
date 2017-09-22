@@ -180,24 +180,23 @@ class LogisticRegression:
                 self.thW,
                 self.thB, 
                 learning_rate)
-        elif optimization_method == 'momentum':
+        elif optimization_params.get('decay'):
+            if optimization_method == 'momentum':
+                updating_function = momentum_method_updates
+            elif optimization_method  == 'nesterov':
+                updating_function = nesterov_method_updates
+            else:
+                raise NotImplementedError("method {} is not implemented".format(optimization_method))
             momentum = optimization_params['decay']
-            return LogisticRegression.__momentum_updates(
-                self.loss,
-                self.thW,
-                self.thB,
-                learning_rate,
-                momentum)
-        elif optimization_method == 'nesterov':
-            momentum = optimization_params['decay']
-            return LogisticRegression.__nesterov_updates(
+            return LogisticRegression.__momentum_like_updates(
+                momentum_method_updates,
                 self.loss,
                 self.thW,
                 self.thB,
                 learning_rate,
                 momentum)
         else:
-            raise NotImplementedError("method {} is not implemented".format(optimization_method))
+            raise ValueError("invalid combination of parameters: {}".format(*optimization_params))
     
     
     def __gradient_descent_updates(loss, W, B, learning_rate):
@@ -208,25 +207,13 @@ class LogisticRegression:
                         for weights in [W, B]])
 
 
-    def __momentum_updates(loss, W, B, learning_rate, momentum):
+    def __momentum_like_updates(updating_function, loss, W, B, learning_rate, momentum):
         """
         gradient descent with momentum updates
         """
         
         updates = sum([
-            momentum_method_updates(loss, weights, learning_rate, momentum)
-            for weights in [W, B]],
-            [])
-        return updates
-
-    
-    def __nesterov_updates(loss, W, B, learning_rate, momentum):
-        """
-        gradient descent with momentum updates
-        """
-        
-        updates = sum([
-            nesterov_method_updates(loss, weights, learning_rate, momentum)
+            updating_function(loss, weights, learning_rate, momentum)
             for weights in [W, B]],
             [])
         return updates
