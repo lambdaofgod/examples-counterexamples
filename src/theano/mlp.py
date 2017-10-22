@@ -17,6 +17,7 @@ class MultilayerPerceptron:
     def __init__(self,
                  n_iter,
                  hidden_sizes,
+                 activation=T.nnet.relu,
                  initialization_type='xavier',
                  batch_size=1000,
                  lmbda=0.0001,
@@ -39,6 +40,9 @@ class MultilayerPerceptron:
         
         hidden_sizes : list[int]
             Sizes of hidden layers
+
+        activation : theano function (default relu)
+            Activation of neural network
 
         initialization_type : str (default 'xavier')
             how to initialize weights
@@ -66,7 +70,7 @@ class MultilayerPerceptron:
     
         self.id = iid
         self.initialization_type = initialization_type
-        self.activation = T.nnet.relu#sigmoid
+        self.activation = activation
         self.hidden_sizes = hidden_sizes 
         self.n_iter = n_iter
         self.l1_ratio = l1_ratio
