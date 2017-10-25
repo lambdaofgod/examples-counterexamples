@@ -89,7 +89,7 @@ def nesterov_method_updates(loss, weights, learning_rate, momentum):
         value=np.zeros(
             weights.get_value().shape,
             dtype=theano.config.floatX),
-        name='velocity_{}'.format(weights.name))
+        name='velocity_prev_{}'.format(weights.name))
            
     velocity_cache_update = (
             velocity_prev,
@@ -102,3 +102,31 @@ def nesterov_method_updates(loss, weights, learning_rate, momentum):
             weights - momentum * velocity_prev + (1 + momentum) * velocity)
       
     return [velocity_cache_update ,velocity_update, weights_update]
+
+
+def rmsprop_updates(loss, weights, learning_rate, decay=0.9, epsilon=1e-6):
+    """
+    Updates for rmsprop learning method
+    MS_{t+1} = decay * MS_t + (1 - decay)  * grad(W_t)^2
+    W_{t+1} = W_t - learning_rate * grad(W_t) / sqrt(MS_{t+1}) 
+
+    Parameters
+    ----------
+
+    loss : theano tensor, scalar function
+
+    weights : theano tensor (shared variable)
+        model parameters
+
+    learning_rate : scalar
+    """
+    weights_gradient = T.grad(cost=loss, wrt=weights)
+    ms = theano.shared(
+        value=np.zeros(
+            weights.get_value().shape,
+            dtype=theano.config.floatX),
+        name='ms_{}'.format(weights.name))
+    
+    return [(ms, decay * ms + (1 - decay) * weights_gradient ** 2),
+            (weights, weights - learning_rate * weights_gradient / T.sqrt(ms + epsilon))]
+
