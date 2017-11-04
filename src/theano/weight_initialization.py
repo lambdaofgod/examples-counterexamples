@@ -1,8 +1,5 @@
 import numpy as np
 
-import theano
-import theano.tensor as T
-
 
 def initialize_weights(shape, initialization_type):
     if initialization_type == 'xavier' and len(shape) > 1:

@@ -1,7 +1,7 @@
 import numpy as np
+import theano.tensor as T
 
 import theano
-import theano.tensor as T
 
 
 def gradient_descent_update(loss, weights, learning_rate):
@@ -48,14 +48,14 @@ def momentum_method_updates(loss, weights, learning_rate, momentum):
             weights.get_value().shape,
             dtype=theano.config.floatX),
         name='velocity_{}'.format(weights.name))
-      
+
     velocity_update = (
-            velocity,
-            momentum * velocity - learning_rate * weights_gradient)
+        velocity,
+        momentum * velocity - learning_rate * weights_gradient)
     weights_update = (
-            weights,
-            weights + velocity)
-      
+        weights,
+        weights + velocity)
+
     return [velocity_update, weights_update]
 
 
@@ -90,18 +90,18 @@ def nesterov_method_updates(loss, weights, learning_rate, momentum):
             weights.get_value().shape,
             dtype=theano.config.floatX),
         name='velocity_prev_{}'.format(weights.name))
-           
+
     velocity_cache_update = (
-            velocity_prev,
-            velocity)
+        velocity_prev,
+        velocity)
     velocity_update = (
-            velocity,
-            momentum * velocity - learning_rate * weights_gradient)
+        velocity,
+        momentum * velocity - learning_rate * weights_gradient)
     weights_update = (
-            weights,
-            weights - momentum * velocity_prev + (1 + momentum) * velocity)
-      
-    return [velocity_cache_update ,velocity_update, weights_update]
+        weights,
+        weights - momentum * velocity_prev + (1 + momentum) * velocity)
+
+    return [velocity_cache_update, velocity_update, weights_update]
 
 
 def rmsprop_updates(loss, weights, learning_rate, decay=0.9, epsilon=1e-6):
@@ -126,7 +126,6 @@ def rmsprop_updates(loss, weights, learning_rate, decay=0.9, epsilon=1e-6):
             weights.get_value().shape,
             dtype=theano.config.floatX),
         name='ms_{}'.format(weights.name))
-    
+
     return [(ms, decay * ms + (1 - decay) * weights_gradient ** 2),
             (weights, weights - learning_rate * weights_gradient / T.sqrt(ms + epsilon))]
-

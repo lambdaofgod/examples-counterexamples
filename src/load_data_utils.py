@@ -3,7 +3,7 @@
 """
 
 import os
-from os.path import join, split 
+from os.path import join, split
 
 
 def get_env_vars(go_up=False):

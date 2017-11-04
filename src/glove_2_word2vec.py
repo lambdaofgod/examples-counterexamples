@@ -9,12 +9,11 @@ held captive. Accordingly, this line has to be inserted into the GloVe
 embeddings file.
 """
 
-import os
 import shutil
-import smart_open
 from sys import platform
 
 import gensim
+import smart_open
 
 
 def load_word2vec_model(glove_file):

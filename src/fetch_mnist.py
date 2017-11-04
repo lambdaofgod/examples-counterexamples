@@ -1,7 +1,5 @@
-import numpy as np
-
-from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_mldata
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
@@ -17,7 +15,8 @@ def preprocessed_mnist(random_state):
 
     X = mnist['data']
     y = mnist['target'].astype(int)
-    X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=random_state) 
+    X_train_raw, X_test_raw, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y,
+                                                                random_state=random_state)
 
     sscaler = StandardScaler()
     X_train = sscaler.fit_transform(X_train_raw)

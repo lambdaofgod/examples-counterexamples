@@ -2,29 +2,25 @@
  this script assumes its functions are called from some of project's subdirectories
 """
 
-
-import os
-import load_data_utils
-
+import matplotlib.pyplot as plt
+import numpy as np
 from skimage.io import imread_collection, concatenate_images
 
-import numpy as np
-import matplotlib.pyplot as plt
-
+import load_data_utils
 
 COLORS = ['xkcd:neon green',
-      'lightcoral',
-      'xkcd:turtle green', 
-      'xkcd:cobalt', 
-      'xkcd:dusky pink', 
-      'xkcd:lighter purple', 
-      'xkcd:light cyan', 
-      'xkcd:khaki', 
-      'xkcd:green yellow', 
-      'xkcd:purple gray', 
-      'xkcd:very light blue', 
-      'xkcd:buff',
-      'xkcd:mushroom']
+          'lightcoral',
+          'xkcd:turtle green',
+          'xkcd:cobalt',
+          'xkcd:dusky pink',
+          'xkcd:lighter purple',
+          'xkcd:light cyan',
+          'xkcd:khaki',
+          'xkcd:green yellow',
+          'xkcd:purple gray',
+          'xkcd:very light blue',
+          'xkcd:buff',
+          'xkcd:mushroom']
 
 
 def load_images():
@@ -39,13 +35,13 @@ def load_images():
     """
     COIL20_SUFFIX = 'coil-20-proc'
     __, DATA_DIR = load_data_utils.get_env_vars(go_up=True)
-    COIL20_DIR = DATA_DIR + '/' +  COIL20_SUFFIX
-    
-    image_list =  imread_collection(COIL20_DIR + '/*.png')
+    COIL20_DIR = DATA_DIR + '/' + COIL20_SUFFIX
+
+    image_list = imread_collection(COIL20_DIR + '/*.png')
     images = concatenate_images(image_list)
     imshape = images.shape
     reshaped_images = images.reshape(imshape[0], imshape[1] * imshape[2])
-    return reshaped_images 
+    return reshaped_images
 
 
 # plotting utils
@@ -68,7 +64,7 @@ def signed_scatterplot(images, labels, label_names):
         for c in np.unique(labels):
             idxs = labels == c
             yield plt.scatter(images[idxs, 0], images[idxs, 1], c=COLORS[c])
-      
+
     plt.legend(plts(images), label_names)
 
 
