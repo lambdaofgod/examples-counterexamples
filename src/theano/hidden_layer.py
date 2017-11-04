@@ -2,7 +2,7 @@ import numpy as np
 
 import theano
 import theano.tensor as T
-from weight_initialization import initialize_weights
+from .weight_initialization import initialize_weights
 
 
 class HiddenLayer:

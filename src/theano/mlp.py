@@ -6,9 +6,9 @@ import theano.tensor as T
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import accuracy_score 
 
-from updates import *
-from hidden_layer import HiddenLayer
-from weight_initialization import initialize_weights
+from .updates import *
+from .hidden_layer import HiddenLayer
+from .weight_initialization import initialize_weights
 
 
 class MultilayerPerceptron:
@@ -24,7 +24,7 @@ class MultilayerPerceptron:
                  l1_ratio=0,
                  random_state=0,
                  learning_rate=0.001,
-                 momentum=None,
+                 optimization_params=None,
                  iid='my nnet'):
         """
         Multilayer Perceptron
@@ -62,7 +62,7 @@ class MultilayerPerceptron:
         learning_rate : float (default=0.001)
             learning rate for learning rule
 
-        momentum : dict or None (default None)
+        optimization_params: dict or None (default None)
             what momentum-related rule to use
             for using momentum pass {'method': 'momentum', 'decay': d}
             where d is amount of momentum
@@ -80,8 +80,8 @@ class MultilayerPerceptron:
         self.optimization_params = {
             "learning_rate": learning_rate 
         }
-        if momentum:
-            self.optimization_params.update(momentum)
+        if optimization_params:
+            self.optimization_params.update(optimization_params)
         else:
             self.optimization_params['method'] = 'gradient_descent'
         
@@ -216,19 +216,21 @@ class MultilayerPerceptron:
             updating_function = momentum_method_updates
         elif optimization_method  == 'nesterov':
             updating_function = nesterov_method_updates
+        elif optimization_method  == 'rmsprop':
+            updating_function = rmsprop_updates
         else:
             raise ValueError("invalid combination of parameters: {}".format(optimization_params))
         
         if optimization_params.get('decay'):
-            momentum = optimization_params['decay']
+            decay = optimization_params['decay']
         else:
-            momentum = None
+            decay = None
         return MultilayerPerceptron.__weight_updates(
                     updating_function,
                     self.loss,
                     self.weights,
                     learning_rate,
-                    momentum)
+                    decay)
 
     
     def __weight_updates(
@@ -236,12 +238,12 @@ class MultilayerPerceptron:
             loss,
             weights_tensors,
             learning_rate,
-            momentum=None):
+            decay=None):
         """
         gradient descent updates
         """
-        if momentum:
-            updates = [updating_function(loss, weights, learning_rate, momentum)
+        if decay:
+            updates = [updating_function(loss, weights, learning_rate, decay)
                         for weights in weights_tensors]
             return sum(updates, []) 
         else: 

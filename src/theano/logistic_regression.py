@@ -6,7 +6,7 @@ import theano.tensor as T
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import accuracy_score 
 
-from updates import *
+from .updates import *
 
 
 class LogisticRegression:
