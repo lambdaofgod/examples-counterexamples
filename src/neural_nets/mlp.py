@@ -1,12 +1,14 @@
+import numpy as np
+import theano
+import theano.tensor as T
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import accuracy_score
 
+from neural_nets.neural_net import NeuralNet
 from .hidden_layer import HiddenLayer
-from .updates import *
-from .weight_initialization import initialize_weights
 
 
-class MultilayerPerceptron:
+class MultilayerPerceptron(NeuralNet):
     def __init__(self,
                  n_iter,
                  hidden_sizes,
@@ -112,7 +114,7 @@ class MultilayerPerceptron:
 
         out = tmp_out
 
-        self.out_W, self.out_B = self.__initialized_weights(input_size, n_classes, self.initialization_type)
+        self.out_W, self.out_B = NeuralNet.initialized_weights(input_size, n_classes, self.initialization_type)
 
         self.weights = ([layer.W for layer in layers] +
                         [layer.b for layer in layers] +
@@ -127,12 +129,12 @@ class MultilayerPerceptron:
         nll = - T.mean(ll)
 
         regularization = T.sum([
-                                   self.__regularization(ws, self.lmbda, self.l1_ratio)
+                                   NeuralNet.regularization(ws, self.lmbda, self.l1_ratio)
                                    for ws in self.weights])
 
         self.loss = nll + regularization
 
-        updates = self.__updates(self.optimization_params)
+        updates = self.updates(self.optimization_params)
 
         # setup training
         self.train_model = theano.function(
@@ -140,7 +142,7 @@ class MultilayerPerceptron:
             outputs=self.loss,
             updates=updates)
 
-        self.__iter_training(self.train_model, X, y, self.n_iter, self.batch_size)
+        self.iter_training(self.train_model, X, y, self.n_iter, self.batch_size)
 
     def predict(self, X):
         if self.is_fitted:
@@ -152,24 +154,6 @@ class MultilayerPerceptron:
         y_pred = self.predict(X)
         return accuracy_score(y, y_pred)
 
-    def __initialized_weights(self, n_dim, n_classes, initialization_type):
-        """
-        initialize weights (shared variables)
-        """
-
-        # initialize class weights
-        out_W = theano.shared(
-            value=initialize_weights((n_dim, n_classes), initialization_type),
-            name='out_W',
-            borrow=True)
-
-        # initialize the biases b as a vector of n_out 0s
-        out_B = theano.shared(
-            value=initialize_weights((n_classes,), initialization_type),
-            name='out_B',
-            borrow=True)
-        return out_W, out_B
-
     def __prediction_function(self):
         """
         actual function used for predicting y given X
@@ -179,80 +163,3 @@ class MultilayerPerceptron:
             inputs=[self.thX],
             outputs=y_pred)
 
-    def __regularization(self, W, lmbda, l1_ratio):
-        """
-        regularization with l1 and l2 weight penalties
-        """
-        weight_penalty = T.sum(W ** 2)
-        l1_penalty = T.sum(abs(W))
-        return (lmbda *
-                ((1 - l1_ratio) * weight_penalty +
-                 l1_ratio * l1_penalty))
-
-    def __updates(self, optimization_params):
-        """
-        choose appropriate updates
-        """
-        optimization_method = optimization_params['method']
-        learning_rate = optimization_params['learning_rate']
-
-        if optimization_method == 'gradient_descent':
-            updating_function = gradient_descent_update
-        elif optimization_method == 'momentum':
-            updating_function = momentum_method_updates
-        elif optimization_method == 'nesterov':
-            updating_function = nesterov_method_updates
-        elif optimization_method == 'rmsprop':
-            updating_function = rmsprop_updates
-        else:
-            raise ValueError("invalid combination of parameters: {}".format(optimization_params))
-
-        if optimization_params.get('decay'):
-            decay = optimization_params['decay']
-        else:
-            decay = None
-        return MultilayerPerceptron.__weight_updates(
-            updating_function,
-            self.loss,
-            self.weights,
-            learning_rate,
-            decay)
-
-    def __weight_updates(
-        updating_function,
-        loss,
-        weights_tensors,
-        learning_rate,
-        decay=None):
-        """
-        gradient descent updates
-        """
-        if decay:
-            updates = [updating_function(loss, weights, learning_rate, decay)
-                       for weights in weights_tensors]
-            return sum(updates, [])
-        else:
-            return ([updating_function(loss, weights, learning_rate)
-                     for weights in weights_tensors])
-
-    def __iter_training(self, train_model, X, y, n_iter, batch_size):
-        """
-        iterate weight updates n_iter times and store loss for each step
-        """
-
-        def get_batch(batch_size):
-            if batch_size:
-                indices = np.random.choice(X.shape[0], batch_size, replace=False)
-                return X[indices, :], y[indices]
-            else:
-                return X, y
-
-        self.losses = []
-        for __ in range(n_iter):
-            X_batch, y_batch = get_batch(batch_size)
-            current_loss = train_model(X_batch, y_batch)
-            self.losses.append(current_loss)
-
-        self.losses = np.array(self.losses)
-
-        self.is_fitted = True
