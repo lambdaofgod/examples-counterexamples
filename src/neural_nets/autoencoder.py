@@ -2,6 +2,7 @@ import numpy as np
 import theano
 import theano.tensor as T
 
+from neural_nets.weight_initialization import initialize_weights
 from .hidden_layer import HiddenLayer
 from .neural_net import NeuralNet
 
@@ -104,22 +105,17 @@ class Autoencoder(NeuralNet):
             self.initialization_type,
             "{} layer {}".format(self.id, 1))
 
-        decoder = HiddenLayer(
-            self.hidden_sizes[0],
-            n_dim,
-            self.activation,
-            self.initialization_type,
-            "{} layer {}".format(self.id, 2))
+        decoder_W = encoder.W.T
+        decoder_b = theano.shared(
+            value=initialize_weights((n_dim, ), self.initialization_type),
+            name='b_{}'.format(self.id))
 
         thH = encoder.forward(thX_in)
-        thX_out = decoder.forward(thH)
-        self.encoder_weights = encoder.W
-        self.decoder_weights = decoder.W
-        self.weights = [self.encoder_weights, self.decoder_weights, encoder.b, decoder.b]
+        thX_out = self.activation(thH.dot(decoder_W) + decoder_b)
+        self.weights = [encoder.W]
 
-        regularization = T.sum([
-                                   NeuralNet.regularization(ws, self.lmbda, self.l1_ratio)
-                                   for ws in [self.encoder_weights, self.decoder_weights]])
+        regularization = T.sum(NeuralNet.regularization(self.weights[0], self.lmbda, self.l1_ratio))
+
         square_loss = T.mean(
             T.sum(
                 (thX_out - thX_expected_out) ** 2,
