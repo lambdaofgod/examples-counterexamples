@@ -97,24 +97,16 @@ class MultilayerPerceptron(NeuralNet):
         self.thX = T.dmatrix('thX')
         self.out_y = T.vector('out_y', dtype='int64')
 
-        # weights
-        tmp_out = self.thX
-        input_size = n_dim
-        layers = []
-        for (n, size) in enumerate(self.hidden_sizes):
-            layer = HiddenLayer(
-                input_size,
-                size,
-                self.activation,
-                self.initialization_type,
-                "{} layer {}".format(self.id, n + 1))
-            layers.append(layer)
-            tmp_out = layer.forward(tmp_out)
-            input_size = size
+        layers, out, output_size = MultilayerPerceptron.initialized_hidden_layers(
+            n_dim,
+            self.thX,
+            self.hidden_sizes,
+            self.activation,
+            self.initialization_type,
+            self.id
+        )
 
-        out = tmp_out
-
-        self.out_W, self.out_B = NeuralNet.initialized_weights(input_size, n_classes, self.initialization_type)
+        self.out_W, self.out_B = NeuralNet.initialized_weights(output_size, n_classes, self.initialization_type)
 
         self.weights = ([layer.W for layer in layers] +
                         [layer.b for layer in layers] +
@@ -163,3 +155,25 @@ class MultilayerPerceptron(NeuralNet):
             inputs=[self.thX],
             outputs=y_pred)
 
+    @staticmethod
+    def initialized_hidden_layers(n_dim,
+                                  input,
+                                  hidden_sizes,
+                                  activation,
+                                  initialization_types,
+                                  iid):
+        # weights
+        tmp_out = input
+        layers = []
+        input_size = n_dim
+        for (n, (size, init_type)) in enumerate(zip(hidden_sizes, initialization_types)):
+            layer = HiddenLayer(
+                input_size,
+                size,
+                activation,
+                initialization_type,
+                "{} layer {}".format(iid, n + 1))
+            layers.append(layer)
+            tmp_out = layer.forward(tmp_out)
+            input_size = size
+        return layers, tmp_out, input_size
