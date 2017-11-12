@@ -11,6 +11,7 @@ class Autoencoder(NeuralNet):
     def __init__(self,
                  n_iter,
                  hidden_sizes,
+                 autoencoder_type='standard',
                  activation=T.nnet.relu,
                  initialization_type='xavier',
                  batch_size=1000,
@@ -35,6 +36,9 @@ class Autoencoder(NeuralNet):
 
         hidden_sizes : list[int]
             Sizes of hidden layers
+
+        autoencoder_type : string
+            Type of autoencoder
 
         activation : theano function (default relu)
             Activation of neural network
@@ -64,6 +68,7 @@ class Autoencoder(NeuralNet):
         """
         self.id = iid
         self.initialization_type = initialization_type
+        self.autoencoder_type = autoencoder_type
         self.activation = activation
         self.hidden_sizes = hidden_sizes
         self.n_iter = n_iter
@@ -114,7 +119,13 @@ class Autoencoder(NeuralNet):
         thX_out = self.activation(thH.dot(decoder_W) + decoder_b)
         self.weights = [encoder.W]
 
-        regularization = T.sum(NeuralNet.regularization(self.weights[0], self.lmbda, self.l1_ratio))
+        if self.autoencoder_type == 'contractive':
+            d_loss = T.jacobian(
+                expression=T.mean(thH, axis=0),
+                wrt=self.weights[0])
+            regularization = self.lmbda * T.sum(d_loss ** 2)
+        else:
+            regularization = T.sum(NeuralNet.regularization(self.weights[0], self.lmbda, self.l1_ratio))
 
         square_loss = T.mean(
             T.sum(
@@ -125,10 +136,12 @@ class Autoencoder(NeuralNet):
         updates = self.updates(self.optimization_params)
 
         # setup training
-        self.train_model = theano.function(
-            inputs=[thX_in, thX_expected_out],
-            outputs=self.loss,
-            updates=updates)
+        self.train_model = self._training_function(
+            thX_in,
+            thX_expected_out,
+            self.loss,
+            updates
+        )
 
         self.iter_training(self.train_model, X, X, self.n_iter, self.batch_size)
 
@@ -145,5 +158,11 @@ class Autoencoder(NeuralNet):
     def transform(self, X):
         return self.project(X)
 
-    def retrieve(self):
+    def retrieve(self, X):
         return self.retrieve(X)
+
+    def _training_function(self, thX_in, thX_expected_out, loss, updates):
+        return theano.function(
+            inputs=[thX_in, thX_expected_out],
+            outputs=loss,
+            updates=updates)
