@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
-def preprocessed_mnist(random_state, preprocess='standardize'):
+def preprocessed_mnist(random_state, preprocess='standardize', scale_min=0, scale_max=1):
     """
     Fetches mnist dataset and then applies standard scaling
 
@@ -17,17 +17,17 @@ def preprocessed_mnist(random_state, preprocess='standardize'):
     y = mnist['target'].astype(int)
     if preprocess == 'standardize':
         return standardize(X, y, random_state)
-    elif preprocess == 'scale_to_unit_cube':
-        return scale_to_unit_cube(X, y, random_state)
+    elif preprocess == 'min_max_scale':
+        return min_max_scale(X, y, random_state, scale_min, scale_max)
     else:
         raise NotImplementedError('Unsupported preprocessing method: {}'.format(preprocess))
 
 
-def scale_to_unit_cube(X_raw, y, random_state):
+def min_max_scale(X_raw, y, random_state, scale_min, scale_max):
     X_mean_subtracted = X_raw - X_raw.mean()
-    scaler = MinMaxScaler(feature_range=(-1, 1))
+    scaler = MinMaxScaler(feature_range=(scale_min, scale_max))
 
-    X = scaler.fit_transform(X_mean_subtracted)
+    X = scaler.fit_transform(X_raw)
     return (train_test_split(
         X,
         y,
