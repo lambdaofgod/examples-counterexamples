@@ -161,6 +161,7 @@ class Autoencoder(NeuralNet):
             outputs=loss,
             updates=updates)
 
+    @staticmethod
     def contractive_penalty(activation, X, W, b):
         thH_in = X.dot(W) + b
         thH_out = activation(thH_in)
