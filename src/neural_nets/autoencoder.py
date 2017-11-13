@@ -92,11 +92,6 @@ class Autoencoder(NeuralNet):
         self.is_fitted = False
 
     def fit(self, X):
-        if self.batch_size:
-            n_examples = self.batch_size
-        else:
-            n_examples = X.shape[0]
-
         n_dim = X.shape[1]
 
         # inputs
@@ -120,10 +115,9 @@ class Autoencoder(NeuralNet):
         self.weights = [encoder.W]
 
         if self.autoencoder_type == 'contractive':
-            d_loss = T.jacobian(
-                expression=T.mean(thH, axis=0),
-                wrt=self.weights[0])
-            regularization = self.lmbda * T.sum(d_loss ** 2)
+            penalty_term = Autoencoder.contractive_penalty(
+                self.activation, thX_in, encoder.W, encoder.b)
+            regularization = self.lmbda * penalty_term
         else:
             regularization = T.sum(NeuralNet.regularization(self.weights[0], self.lmbda, self.l1_ratio))
 
@@ -166,3 +160,10 @@ class Autoencoder(NeuralNet):
             inputs=[thX_in, thX_expected_out],
             outputs=loss,
             updates=updates)
+
+    def contractive_penalty(activation, X, W, b):
+        thH_in = X.dot(W) + b
+        thH_out = activation(thH_in)
+        jacobian = T.grad(thH_out.sum(), thH_in)
+        weight_term = W.sum(axis=0)
+        return T.sqr(jacobian).dot(T.sqr(weight_term)).sum()
