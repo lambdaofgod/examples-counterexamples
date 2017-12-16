@@ -2,7 +2,7 @@ import numpy as np
 import theano
 import theano.tensor as T
 
-from neural_nets.weight_initialization import initialize_weights
+from .weight_initialization import initialize_weights
 from .hidden_layer import HiddenLayer
 from .neural_net import NeuralNet
 
@@ -40,7 +40,7 @@ class Autoencoder(NeuralNet):
         autoencoder_type : string
             Type of autoencoder
 
-        activation : theano function (default relu)
+        activation : str function (default 'relu')
             Activation of neural network
 
         initialization_type : str (default 'xavier')
@@ -69,7 +69,7 @@ class Autoencoder(NeuralNet):
         self.id = iid
         self.initialization_type = initialization_type
         self.autoencoder_type = autoencoder_type
-        self.activation = activation
+        self.activation = self._activation(activation)
         self.hidden_sizes = hidden_sizes
         self.n_iter = n_iter
         self.l1_ratio = l1_ratio

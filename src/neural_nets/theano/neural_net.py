@@ -105,3 +105,14 @@ class NeuralNet:
         self.losses = np.array(self.losses)
 
         self.is_fitted = True
+
+    def _activation(self, activation_type):
+        activations_dict = {
+            "tanh": T.tanh,
+            "sigmoid": T.nnet.sigmoid,
+            "relu": T.nnet.relu
+        }
+        if activation_type in activations_dict.keys():
+            return activations_dict[activation_type]
+        else:
+            raise NotImplementedError("{} activation unsupported".format(activation_type))

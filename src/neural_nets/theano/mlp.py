@@ -4,7 +4,7 @@ import theano.tensor as T
 from sklearn.exceptions import NotFittedError
 from sklearn.metrics import accuracy_score
 
-from neural_nets.neural_net import NeuralNet
+from .neural_net import NeuralNet
 from .hidden_layer import HiddenLayer
 
 
@@ -12,7 +12,7 @@ class MultilayerPerceptron(NeuralNet):
     def __init__(self,
                  n_iter,
                  hidden_sizes,
-                 activation=T.nnet.relu,
+                 activation='relu',
                  initialization_type='xavier',
                  batch_size=1000,
                  lmbda=0.0001,
@@ -36,7 +36,7 @@ class MultilayerPerceptron(NeuralNet):
         hidden_sizes : list[int]
             Sizes of hidden layers
 
-        activation : theano function (default relu)
+        activation : str (default 'relu')
             Activation of neural network
 
         initialization_type : str (default 'xavier')
@@ -65,7 +65,7 @@ class MultilayerPerceptron(NeuralNet):
 
         self.id = iid
         self.initialization_type = initialization_type
-        self.activation = activation
+        self.activation = self._activation(activation)
         self.hidden_sizes = hidden_sizes
         self.n_iter = n_iter
         self.l1_ratio = l1_ratio
@@ -163,15 +163,20 @@ class MultilayerPerceptron(NeuralNet):
                                   initialization_types,
                                   iid):
         # weights
+        if isinstance(initialization_types, str):
+            layer_parameters = ((size, initialization_types) for size in hidden_sizes)
+        else:
+            layer_parameters = zip(hidden_sizes, initialization_types)
+
         tmp_out = input
         layers = []
         input_size = n_dim
-        for (n, (size, init_type)) in enumerate(zip(hidden_sizes, initialization_types)):
+        for (n, (size, init_type)) in enumerate(layer_parameters):
             layer = HiddenLayer(
                 input_size,
                 size,
                 activation,
-                initialization_type,
+                init_type,
                 "{} layer {}".format(iid, n + 1))
             layers.append(layer)
             tmp_out = layer.forward(tmp_out)
