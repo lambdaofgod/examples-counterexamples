@@ -9,4 +9,4 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 [(counterexample) if a dataset is linearly separable then it is linearly separable after applying PCA](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Separable%20data%20PCA%20nonseparable.ipynb)
 
-[Logistic regression in Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Theano/Logistic%20Regression%20with%20Theano.ipynb) [(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Theano/logistic_regression.py)
+[Logistic regression in Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Logistic%20Regression%20with%20Theano.ipynb)[(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/src/neural_nets/theano/logistic_regression.py)
