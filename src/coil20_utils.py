@@ -1,12 +1,8 @@
-"""
- this script assumes its functions are called from some of project's subdirectories
-"""
-
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.io import imread_collection, concatenate_images
 
-import load_data_utils
+from src import load_data_utils
 
 COLORS = ['xkcd:neon green',
           'lightcoral',
