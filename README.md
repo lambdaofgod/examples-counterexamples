@@ -1,5 +1,7 @@
 # examples-counterexamples
 
+To run examples using code from `src` you'll need to run `python setup.py develop`
+
 ## Examples of some machine learning-related facts and libraries
 
 * [Kernel SVMs: fitting sine function, nonlinear classification with RBF kernel](
