@@ -1,8 +1,15 @@
 # examples-counterexamples
 
-To run examples using code from `src` you'll need to run `python setup.py develop`
-
 ## Examples of some machine learning-related facts and libraries
+
+### Requirements
+To run examples using code from `src` you'll need to run `python setup.py develop`. 
+
+Some examples also require `graphviz` installed (on Ubuntu you can do `apt-get install graphviz`) 
+
+For loading data for word embeddings or coil20 dataset see `Makefile`.
+
+## Notebooks
 
 * [Kernel SVMs: fitting sine function, nonlinear classification with RBF kernel](
 https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Kernel%20SVMs.ipynb)
@@ -16,7 +23,7 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 * [Logistic regression](https://en.wikipedia.org/wiki/Logistic_regression) - [using Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Logistic%20Regression%20with%20Theano.ipynb) [(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/src/neural_nets/theano/logistic_regression.py)  
 
-* [Basic MXNet - logistic regression](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/MXNet%20basics.ipynb)
+* [Basic MXNet - logistic regression & MLP](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/MXNet%20basics.ipynb)
 
 ### Other
 
