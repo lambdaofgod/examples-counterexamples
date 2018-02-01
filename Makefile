@@ -10,3 +10,5 @@ load_word_embeddings:
 prepare_embeddings:
 	python src/convert_glove_2_word2vec.py $(in_file_name) $(out_file_name) 
 
+load_101_categories:
+	bash scripts/load_101_categories.sh
