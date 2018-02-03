@@ -25,6 +25,8 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 * [Basic MXNet - logistic regression & MLP](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/MXNet%20basics.ipynb)
 
+* [Visualizing Convolutional Neural Networks in Keras with Quiver](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Keras%20CNN%20visualization%20with%20Quiver.ipynb)
+
 ### Other
 
 * [Minimal CoreNLP Scala notebook](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/CoreNLP.ipynb)
