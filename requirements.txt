@@ -6,7 +6,6 @@ idna==2.6
 matplotlib==2.1.1
 mxnet==1.0.0.post2
 numpy==1.13.3
-pkg-resources==0.0.0
 pyparsing==2.2.0
 python-dateutil==2.6.1
 pytz==2017.3
@@ -16,3 +15,6 @@ scipy==1.0.0
 six==1.11.0
 urllib3==1.22
 jupyter==1.0.0
+scikit-plot==0.3.5
+pkg-resources==0.0.0
+xgboost==0.8.0
