@@ -19,6 +19,10 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 * [(counterexample) if a dataset is linearly separable then it is linearly separable after applying PCA](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Separable%20data%20PCA%20nonseparable.ipynb)
 
+* [Extractive Summarization](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/text_mining/Extractive_Summarization.ipynb) in Python, includes one word-embedding based method.
+
+* [Nonnegative Matrix Factorization (NMF) for topic modeling](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/text_mining/NMF%20for%20topic%20modeling.ipynb) - very simple exaple on 20 Newsgroups 
+
 ### Deep learning frameworks
 
 * [Logistic regression](https://en.wikipedia.org/wiki/Logistic_regression) - [using Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Logistic%20Regression%20with%20Theano.ipynb) [(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/src/neural_nets/theano/logistic_regression.py)  
