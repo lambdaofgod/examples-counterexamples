@@ -23,7 +23,9 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 * [Nonnegative Matrix Factorization (NMF) for topic modeling](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/text_mining/NMF%20for%20topic%20modeling.ipynb) - very simple exaple on 20 Newsgroups 
 
-### Deep learning frameworks
+### Deep learning 
+
+*[Symmetric Deep Dream](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/deepdream_symmetric.ipynb) - added rotation/mirroring invariance to original Deep Dream code
 
 * [Logistic regression](https://en.wikipedia.org/wiki/Logistic_regression) - [using Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Logistic%20Regression%20with%20Theano.ipynb) [(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/src/neural_nets/theano/logistic_regression.py)  
 
