@@ -25,7 +25,9 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 ### Deep learning 
 
-*[Symmetric Deep Dream](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/deepdream_symmetric.ipynb) - added rotation/mirroring invariance to original Deep Dream code
+* [Symmetric Deep Dream](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/deepdream_symmetric.ipynb) - added rotation/mirroring invariance to original Deep Dream code
+
+* [Variational Autoencoder (VAE) in Keras](https://colab.research.google.com/drive/1iQ4rX3Xr2YJpaMlO_98XldvRGCPZESRA) - Example of running generative model on very small dataset (Olivetti faces dataset - 400 examples). Adapted and refactored code from Keras project.
 
 * [Logistic regression](https://en.wikipedia.org/wiki/Logistic_regression) - [using Theano](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Logistic%20Regression%20with%20Theano.ipynb) [(code)](https://github.com/lambdaofgod/examples-counterexamples/blob/master/src/neural_nets/theano/logistic_regression.py)  
 
