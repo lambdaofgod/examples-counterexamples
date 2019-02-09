@@ -33,6 +33,8 @@ https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/Ke
 
 * [Basic MXNet - logistic regression & MLP](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/MXNet%20basics.ipynb)
 
+* [GANs in Gluon](https://colab.research.google.com/drive/1Esr2lPhx9yKPYyMvJIGWKt68YjEJQMg7) - using Gluon's Hybrid Blocks which utilize dynamic graphs by default, but can be compiled to static ones
+
 * [Visualizing Convolutional Neural Networks in Keras with Quiver](https://github.com/lambdaofgod/examples-counterexamples/blob/master/notebooks/neural_nets/Keras%20CNN%20visualization%20with%20Quiver.ipynb)
 
 ### Other
