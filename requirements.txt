@@ -16,5 +16,4 @@ six>=1.11.0
 urllib3>=1.22
 jupyter>=1.0.0
 scikit-plot>=0.3.5
-pkg-resources>=0.0.0
 xgboost>=0.8.0
