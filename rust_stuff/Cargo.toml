@@ -1,0 +1,9 @@
+[package]
+name = "rust_stuff"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.2.4", features = ["derive"] }
+openapi_type = "0.4.2"
+serde = "1.0.160"

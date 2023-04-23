@@ -1,0 +1,69 @@
+:PROPERTIES:
+:ID:       459e155c-6486-4aee-ab4a-e99faccacb1c
+:END:
+#+title: org-ai/rust
+
+* Backend/axum
+
+#+BEGIN_AI
+How can I add Swagger to axum in Rust?
+
+[AI]: Currently, there is no dedicated library or plug-and-play solution for integrating Swagger (OpenAPI) with Axum in Rust. However, you can manually implement the OpenAPI specification (former Swagger) for your Axum application by following these steps:
+
+1. Create an OpenAPI Specification file:
+   Create a YAML or JSON file describing your Axum REST API according to the OpenAPI specification. You can use [Swagger editor](https://editor.swagger.io/) to help create and validate your specification. Save the resulting file (e.g., `openapi.yaml` or `openapi.json`).
+
+2. Serve the OpenAPI Specification file:
+   Include the OpenAPI specification file in#
+
+[Me]: Ok, how can I write types that will be serialized to JSON that will be returned from axum endpoints and export them to OpenAPI?
+
+[AI]: There's no direct solution to generate the OpenAPI specification from your types in Axum automatically, but you can manually create the OpenAPI document to describe your types and define the responses for your Axum endpoints. To serialize the types as JSON and serve through Axum, follow these steps:
+
+1. Add the required dependencies to your `Cargo.toml`#+END_AI
+
+#+BEGIN_AI
+How can I define types in Rust axum that would describe endpoint returns and can be exported to OpenAPI specification?
+
+[AI]: To define types in Rust that describe the endpoint returns in Axum and can be manually added to an OpenAPI specification, follow these steps:
+
+1. Add the dependencies to your `Cargo.toml`:
+
+```toml
+[dependencies]
+axum = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+```
+
+2. Define your types using structs and derive `serde::Serialize` for serialization:
+
+```rust
+use serde::Serialize;
+
+#[derive(Serialize)]
+pub struct User {
+    pub id: u32,
+    pub name: String,
+    pub email: String,
+}
+
+#[derive(Serialize)]
+pub struct ErrorResponse {
+    pub error: String,
+}
+```
+
+3. Create endpoints that return your types:
+
+```rust
+use axum::{handler::get, Router};
+use http::StatusCode;
+us serd_json::js;
+
+async fn get_use() -> Resu<imp IntoResponse, Infallible> {
+    letlltr user = User {
+        id,
+      nam "Alice".e:t_strin()        emai alice@example.com".to_string":l,
+go  :1 onee#+END_AI
