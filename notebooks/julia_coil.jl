@@ -224,6 +224,9 @@ begin
 	add_classes(umap_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
 
+# ╔═╡ 237f7829-fde9-4b24-b024-45bdddb2a278
+
+
 # ╔═╡ Cell order:
 # ╠═c7fdaf8f-5d97-4a71-b478-002d60b9e741
 # ╠═e3e020ac-6aaf-11ee-0d9a-85e0beb5ca6e
@@ -258,3 +261,4 @@ end
 # ╠═929e6c0e-c9c7-4b28-8a94-2937a797421b
 # ╠═5d587c26-f0f3-44c7-8c9d-bc2516be03dd
 # ╠═3402f6d0-c41a-4a96-a66c-96263ee7defe
+# ╠═237f7829-fde9-4b24-b024-45bdddb2a278
