@@ -28,6 +28,9 @@ begin
 	theme(:juno)
 end
 
+# ╔═╡ a3f57b84-a692-43a5-9f32-98943fcdd837
+using Ripserer
+
 # ╔═╡ c7fdaf8f-5d97-4a71-b478-002d60b9e741
 md"""
 ## Setup
@@ -225,7 +228,74 @@ begin
 end
 
 # ╔═╡ 237f7829-fde9-4b24-b024-45bdddb2a278
+md"""
 
+## Comparing the embeddings with topological data analysis
+
+"""
+
+# ╔═╡ 358d0bcc-822a-47c1-ae0c-79feacbd5520
+X_umap = Array(umap_learner.reduced_df[!,[:x1,:x2]])
+
+# ╔═╡ 80e6d342-c4d5-4960-a23e-f61c82c8b8ab
+function get_ripserer_result(data)
+	ripserer(Tuple.(eachrow(data)));
+end
+
+# ╔═╡ f892f93c-196a-47ec-b759-6fd33988c131
+function get_ripserer_result(manifold_learner :: ManifoldLearner)
+	get_ripserer_result(manifold_learner.reduced_df[!,[:x1, :x2]])
+end
+
+# ╔═╡ d51d8eeb-b268-4bd7-bb07-9c3c6e6ae298
+typeof(umap_learner)
+
+# ╔═╡ 7487066c-b457-40b1-87b4-085482588fcb
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	persistence_plots = []
+	for learner in [umap_learner, isomap_learner, ltsa_learner]
+		result = get_ripserer_result(learner)
+		learner_type = typeof(learner)
+		append!(persistence_plots, plot(result; infinity=3))
+	end
+	plot((p for p in persistence_plots))
+end
+  ╠═╡ =#
+
+# ╔═╡ 3522ed36-038c-4f21-ac45-215ba949dfe8
+plt_diag = plot(get_ripserer_result(X_umap); infinity=3)
+
+# ╔═╡ 3fab2f23-3c5c-4885-8bf7-79864b83d09e
+
+begin
+	#l = @layout [a b c]
+	tda_plots = []
+	learner = umap_learner
+	for (i, learner) in enumerate([umap_learner, isomap_learner, ltsa_learner])
+		method = learner.args.method
+		result = get_ripserer_result(learner)
+		p = plot(result, title=nameof(method); infinity=3)
+		append!(tda_plots, p)
+	end
+	append!(tda_plots, get_ripserer_result(raw_coil_matrix))
+	#plot(tda_plots..., layout=3)
+end
+
+# ╔═╡ 5c15080f-f894-41c0-bf5c-b481cc3a945e
+plot(tda_plots[4])
+
+# ╔═╡ 708f1bb3-fe0f-4265-87a8-ce3d32ad9b03
+begin
+	plot(tda_plots[1])
+end
+
+# ╔═╡ 6d9d9c33-1d27-4bea-851c-d68b78f1d274
+plot!(tda_plots[2], subplot=2)
+
+# ╔═╡ dadb316c-7d7b-46d1-8e69-491614ead604
+plot!(tda_plots[3], subplot=2)
 
 # ╔═╡ Cell order:
 # ╠═c7fdaf8f-5d97-4a71-b478-002d60b9e741
@@ -262,3 +332,15 @@ end
 # ╠═5d587c26-f0f3-44c7-8c9d-bc2516be03dd
 # ╠═3402f6d0-c41a-4a96-a66c-96263ee7defe
 # ╠═237f7829-fde9-4b24-b024-45bdddb2a278
+# ╠═a3f57b84-a692-43a5-9f32-98943fcdd837
+# ╠═358d0bcc-822a-47c1-ae0c-79feacbd5520
+# ╠═80e6d342-c4d5-4960-a23e-f61c82c8b8ab
+# ╠═f892f93c-196a-47ec-b759-6fd33988c131
+# ╠═d51d8eeb-b268-4bd7-bb07-9c3c6e6ae298
+# ╠═7487066c-b457-40b1-87b4-085482588fcb
+# ╠═3522ed36-038c-4f21-ac45-215ba949dfe8
+# ╠═3fab2f23-3c5c-4885-8bf7-79864b83d09e
+# ╠═5c15080f-f894-41c0-bf5c-b481cc3a945e
+# ╠═708f1bb3-fe0f-4265-87a8-ce3d32ad9b03
+# ╠═6d9d9c33-1d27-4bea-851c-d68b78f1d274
+# ╠═dadb316c-7d7b-46d1-8e69-491614ead604
