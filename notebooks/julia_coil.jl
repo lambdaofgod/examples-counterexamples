@@ -113,32 +113,76 @@ pca = fit(PCA, coil_matrix; maxoutdim=2);
 # ╔═╡ 761adf8a-2bc2-4217-9b7c-6483de01b6df
 scatter(pca.proj[:,1], pca.proj[:,2])
 
-# ╔═╡ 554b0697-13bd-43ec-a6a8-0f62b4ca0e74
-function reduce_dimension(method, X; maxoutdim=2, k=25)
-	reducer = fit(method, X; maxoutdim=maxoutdim, k=k)
-	(reducer, ManifoldLearning.predict(reducer))
+# ╔═╡ fc3b5001-85f9-4494-99fa-df823e184bf2
+struct ManifoldLearnerArgs
+	method
+	dim :: Integer
+	k :: Integer
 end
 
-# ╔═╡ e3737480-a3c6-40ba-8c38-de96e2e07a4c
-function make_reduced_df(X_reduced)
-	DataFrame(X_reduced, :auto);
-	reduced_df
+# ╔═╡ c50a27e5-d32b-4874-a3b1-f8c6f8434952
+struct ManifoldLearner
+	reducer
+	args :: ManifoldLearnerArgs
+	input_data :: Union{Matrix, Nothing}
+	reduced_df :: Union{DataFrame, Nothing}
 end
 
-# ╔═╡ bbdc2431-1252-467c-90a3-5e35cd20ae15
-function make_reduced_df(X_reduced, class_names)
-	reduced_df = DataFrame(X_reduced, :auto);
-	reduced_df[!,"class"] = class_names
-	reduced_df
+# ╔═╡ b957aea4-77db-4b0e-8126-40d683098a21
+# ╠═╡ disabled = true
+#=╠═╡
+
+  ╠═╡ =#
+
+# ╔═╡ 2557d853-06fb-4ffd-8310-f9fc6abe3f47
+begin 
+	function make_reduced_dataframe(X_reduced)
+		DataFrame(X_reduced, :auto);
+	end
+	
+	function make_reduced_dataframe(X_reduced, class_names)
+		reduced_df = DataFrame(X_reduced, :auto);
+		reduced_df[!,"class"] = class_names
+		reduced_df
+	end
 end
 
-# ╔═╡ 968e2464-5def-488b-9557-50412a4fdf49
-function get_manifold_learning_results(method, X, class_names; maxoutdim=2, k=25)
-	(reducer, X_reduced) = reduce_dimension(method, transpose(X); maxoutdim=maxoutdim, k=k)
-	println(X_reduced |> size)
-	println(class_names |> size)
-	reduced_df = make_reduced_df(transpose(X_reduced), class_names);
-	(reducer, reduced_df)
+# ╔═╡ 768f3d06-c291-4543-aa71-0c00b34ae395
+
+
+# ╔═╡ fb6b14ee-f5fe-4627-a3aa-6cfc27d1f30a
+
+
+# ╔═╡ 6ca00b8c-47b9-415a-aa11-cb1631ada099
+function fit_manifold_learner_impl(method :: Type{UMAP_}, dim, k, data)
+	umap = method(data', dim, n_neighbors=k)
+	(umap, make_reduced_dataframe(umap.embedding'))
+end
+
+# ╔═╡ cbf50c05-5a74-46f7-9af1-82c76005209c
+ManifoldLearningType = Union{Type{Isomap}, Type{LTSA}}
+
+# ╔═╡ dad24919-c768-463a-a677-dbc415df0bb5
+function fit_manifold_learner_impl(method :: ManifoldLearningType, dim, k, data)
+	reducer = fit(method, data'; maxoutdim=dim, k=k)
+	(reducer, make_reduced_dataframe(ManifoldLearning.predict(reducer)'))
+end
+
+# ╔═╡ d6dda024-56c1-4614-aa7d-ce721e09a0f7
+function fit_manifold_learner(args :: ManifoldLearnerArgs, data)
+	(reducer, reduced_df) = fit_manifold_learner_impl(args.method, args.dim, args.k, data)
+	ManifoldLearner(
+		reducer,
+		args,
+		data,
+		reduced_df
+	)
+end
+
+# ╔═╡ c5b61420-7cfe-4091-82eb-d270c690456a
+function add_classes(df, classes)
+	df[!, "class"] = classes
+	df
 end
 
 # ╔═╡ 1d330da1-0acd-49db-bb44-32fe586449f3
@@ -146,10 +190,10 @@ md"""
 ## Isomap
 """
 
-# ╔═╡ e100ea6f-a28e-44fa-a725-f6b8ee7349a8
+# ╔═╡ 1f06cd86-ac38-465b-8958-d635450be118
 begin
-	(isomap, coil_isomap_df) = get_manifold_learning_results(Isomap, coil_matrix, class_names; maxoutdim=2, k=21)
-	coil_isomap_df |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
+	isomap_learner = fit_manifold_learner(ManifoldLearnerArgs(Isomap, 2, 21), coil_matrix)
+	add_classes(isomap_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
 
 # ╔═╡ 24b72a9c-9a50-461e-af43-9dd27a9d25d4
@@ -158,11 +202,13 @@ md"""
 ## LTSA
 """
 
-# ╔═╡ a2e75732-de29-4223-8422-6332315947a4
+# ╔═╡ 3e4eb31e-8a06-4fcf-ba08-3a20f7dacab7
 begin
-	(ltsa, coil_ltsa_df) = get_manifold_learning_results(LTSA, coil_matrix, class_names; maxoutdim=2, k=21)
-	coil_ltsa_df |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
+	ltsa_learner = fit_manifold_learner(ManifoldLearnerArgs(LTSA, 2, 21), coil_matrix)
+	add_classes(ltsa_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
+
+# ╔═╡ 929e6c0e-c9c7-4b28-8a94-2937a797421b
 
 
 # ╔═╡ 5d587c26-f0f3-44c7-8c9d-bc2516be03dd
@@ -174,9 +220,8 @@ md"""
 
 # ╔═╡ 3402f6d0-c41a-4a96-a66c-96263ee7defe
 begin
-	umap = UMAP_(coil_matrix', 2, n_neighbors=21)
-	coil_umap_df =  make_reduced_df(umap.embedding', class_names)
-	coil_umap_df |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480);
+	umap_learner = fit_manifold_learner(ManifoldLearnerArgs(UMAP_, 2, 22), coil_matrix)
+	add_classes(umap_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
 
 # ╔═╡ Cell order:
@@ -195,13 +240,21 @@ end
 # ╠═d06e5992-3a35-4d9c-82f8-b94c1abb9042
 # ╠═4dd21b66-54d7-470e-9080-1ff40628d716
 # ╠═761adf8a-2bc2-4217-9b7c-6483de01b6df
-# ╠═554b0697-13bd-43ec-a6a8-0f62b4ca0e74
-# ╠═968e2464-5def-488b-9557-50412a4fdf49
-# ╠═e3737480-a3c6-40ba-8c38-de96e2e07a4c
-# ╠═bbdc2431-1252-467c-90a3-5e35cd20ae15
+# ╠═fc3b5001-85f9-4494-99fa-df823e184bf2
+# ╠═c50a27e5-d32b-4874-a3b1-f8c6f8434952
+# ╠═b957aea4-77db-4b0e-8126-40d683098a21
+# ╠═d6dda024-56c1-4614-aa7d-ce721e09a0f7
+# ╠═2557d853-06fb-4ffd-8310-f9fc6abe3f47
+# ╠═768f3d06-c291-4543-aa71-0c00b34ae395
+# ╠═fb6b14ee-f5fe-4627-a3aa-6cfc27d1f30a
+# ╠═6ca00b8c-47b9-415a-aa11-cb1631ada099
+# ╠═cbf50c05-5a74-46f7-9af1-82c76005209c
+# ╠═dad24919-c768-463a-a677-dbc415df0bb5
+# ╠═c5b61420-7cfe-4091-82eb-d270c690456a
 # ╠═1d330da1-0acd-49db-bb44-32fe586449f3
-# ╠═e100ea6f-a28e-44fa-a725-f6b8ee7349a8
+# ╠═1f06cd86-ac38-465b-8958-d635450be118
 # ╠═24b72a9c-9a50-461e-af43-9dd27a9d25d4
-# ╠═a2e75732-de29-4223-8422-6332315947a4
+# ╠═3e4eb31e-8a06-4fcf-ba08-3a20f7dacab7
+# ╠═929e6c0e-c9c7-4b28-8a94-2937a797421b
 # ╠═5d587c26-f0f3-44c7-8c9d-bc2516be03dd
 # ╠═3402f6d0-c41a-4a96-a66c-96263ee7defe
