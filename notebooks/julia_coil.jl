@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # ╔═╡ e3e020ac-6aaf-11ee-0d9a-85e0beb5ca6e
 begin
-	using Pkg
+	import Pkg
 	Pkg.activate("../JuliaExamples")
 end
 
@@ -24,12 +24,11 @@ begin
 	using DataFrames
 	using Statistics
 	using UMAP
-	
+	using Ripserer
+	using ProgressLogging
+	using PersistenceDiagrams
 	theme(:juno)
 end
-
-# ╔═╡ a3f57b84-a692-43a5-9f32-98943fcdd837
-using Ripserer
 
 # ╔═╡ c7fdaf8f-5d97-4a71-b478-002d60b9e741
 md"""
@@ -78,27 +77,25 @@ end
 histogram(real.(float(img[:])))
 
 # ╔═╡ 7f901f65-5c90-4485-a7c5-180fe71e9a7e
-# ╠═╡ disabled = true
-#=╠═╡
 function images_dataset_to_vectors_dataset(img_dataset, img_size=(32,32))
 	img_flat_size = img_size[1] * img_size[2]
 	resized_img_coil_dataset = map(img -> imresize(img, img_size), img_dataset)
 	map(img -> real.(reshape(float(img), img_flat_size)), resized_img_coil_dataset)
 end
-  ╠═╡ =#
 
 # ╔═╡ 2de9492f-424c-478b-918e-b282b5f668fa
+
 begin
 	img_size = (64, 64)
 	img_flat_size = img_size[1] * img_size[2]
 	coil_dataset = images_dataset_to_vectors_dataset(img_coil_dataset);
 	raw_coil_matrix = transpose(hcat(coil_dataset...));
 	nonconstant_columns = (norm.(raw_coil_matrix |> eachcol)) .> 1e-3;
-	coil_matrix = raw_coil_matrix[:, nonconstant_columns]
+	coil_matrix = raw_coil_matrix[:, nonconstant_columns];
 	#coil_matrix_normalized = normalize(coil_matrix);
 end
 
-# ╔═╡ bf2851b6-9d5a-4a02-a3c9-856823322a54
+# ╔═╡ 59f6419d-69d3-40f3-b9a6-8fe6cda2d3f8
 begin
 	img_vector = coil_matrix[1,:];
 	println(typeof(img_vector))
@@ -110,10 +107,10 @@ md"""
 ## Dimensionality reduction
 """
 
-# ╔═╡ 4dd21b66-54d7-470e-9080-1ff40628d716
+# ╔═╡ 8f581281-f954-477c-b3ab-237736fee67f
 pca = fit(PCA, coil_matrix; maxoutdim=2);
 
-# ╔═╡ 761adf8a-2bc2-4217-9b7c-6483de01b6df
+# ╔═╡ 83ff34cc-609b-4628-84f0-ff1ff26e6d9a
 scatter(pca.proj[:,1], pca.proj[:,2])
 
 # ╔═╡ fc3b5001-85f9-4494-99fa-df823e184bf2
@@ -131,12 +128,6 @@ struct ManifoldLearner
 	reduced_df :: Union{DataFrame, Nothing}
 end
 
-# ╔═╡ b957aea4-77db-4b0e-8126-40d683098a21
-# ╠═╡ disabled = true
-#=╠═╡
-
-  ╠═╡ =#
-
 # ╔═╡ 2557d853-06fb-4ffd-8310-f9fc6abe3f47
 begin 
 	function make_reduced_dataframe(X_reduced)
@@ -149,12 +140,6 @@ begin
 		reduced_df
 	end
 end
-
-# ╔═╡ 768f3d06-c291-4543-aa71-0c00b34ae395
-
-
-# ╔═╡ fb6b14ee-f5fe-4627-a3aa-6cfc27d1f30a
-
 
 # ╔═╡ 6ca00b8c-47b9-415a-aa11-cb1631ada099
 function fit_manifold_learner_impl(method :: Type{UMAP_}, dim, k, data)
@@ -193,9 +178,9 @@ md"""
 ## Isomap
 """
 
-# ╔═╡ 1f06cd86-ac38-465b-8958-d635450be118
+# ╔═╡ 57587a27-19d3-433a-a29f-12b4df2ceb4e
 begin
-	isomap_learner = fit_manifold_learner(ManifoldLearnerArgs(Isomap, 2, 21), coil_matrix)
+	isomap_learner = fit_manifold_learner(ManifoldLearnerArgs(Isomap, 2, 25), coil_matrix)
 	add_classes(isomap_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
 
@@ -205,14 +190,11 @@ md"""
 ## LTSA
 """
 
-# ╔═╡ 3e4eb31e-8a06-4fcf-ba08-3a20f7dacab7
+# ╔═╡ e34f9cba-5234-4c1b-a8d7-78a6c4151540
 begin
 	ltsa_learner = fit_manifold_learner(ManifoldLearnerArgs(LTSA, 2, 21), coil_matrix)
 	add_classes(ltsa_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
 end
-
-# ╔═╡ 929e6c0e-c9c7-4b28-8a94-2937a797421b
-
 
 # ╔═╡ 5d587c26-f0f3-44c7-8c9d-bc2516be03dd
 md"""
@@ -221,7 +203,7 @@ md"""
 
 """
 
-# ╔═╡ 3402f6d0-c41a-4a96-a66c-96263ee7defe
+# ╔═╡ 0307bc4e-fb3b-4347-9216-3f8745d1229f
 begin
 	umap_learner = fit_manifold_learner(ManifoldLearnerArgs(UMAP_, 2, 22), coil_matrix)
 	add_classes(umap_learner.reduced_df, class_names) |> @vlplot(:point, x=:x1, y=:x2, color="class", width=640, height=480)
@@ -234,9 +216,6 @@ md"""
 
 """
 
-# ╔═╡ 358d0bcc-822a-47c1-ae0c-79feacbd5520
-X_umap = Array(umap_learner.reduced_df[!,[:x1,:x2]])
-
 # ╔═╡ 80e6d342-c4d5-4960-a23e-f61c82c8b8ab
 function get_ripserer_result(data)
 	ripserer(Tuple.(eachrow(data)));
@@ -247,55 +226,85 @@ function get_ripserer_result(manifold_learner :: ManifoldLearner)
 	get_ripserer_result(manifold_learner.reduced_df[!,[:x1, :x2]])
 end
 
-# ╔═╡ d51d8eeb-b268-4bd7-bb07-9c3c6e6ae298
-typeof(umap_learner)
-
-# ╔═╡ 7487066c-b457-40b1-87b4-085482588fcb
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	persistence_plots = []
-	for learner in [umap_learner, isomap_learner, ltsa_learner]
-		result = get_ripserer_result(learner)
-		learner_type = typeof(learner)
-		append!(persistence_plots, plot(result; infinity=3))
-	end
-	plot((p for p in persistence_plots))
+# ╔═╡ 0f080f44-b4c3-4928-bbe1-8daca9ffca9e
+function plot_persistence_diagram(manifold_learner :: ManifoldLearner)
+	ripserer_results = get_ripserer_result(manifold_learner)
+	plt_diag = plot(ripserer_results; infinity=3, title=string(manifold_learner.args.method))
 end
-  ╠═╡ =#
+
+# ╔═╡ 9e2fa136-8db4-4ef0-97e9-a5345ab03571
+plot_persistence_diagram(umap_learner)
 
 # ╔═╡ 3522ed36-038c-4f21-ac45-215ba949dfe8
-plt_diag = plot(get_ripserer_result(X_umap); infinity=3)
+plot_persistence_diagram(isomap_learner)
 
-# ╔═╡ 3fab2f23-3c5c-4885-8bf7-79864b83d09e
+# ╔═╡ 9fa2e5e9-6f2d-4a53-afac-7b585e658c3c
+plot_persistence_diagram(ltsa_learner)
 
+# ╔═╡ c0000587-2a64-4687-976a-67efc806c4a4
+md"""
+## Comparing stability w.r.t to hyperparameters using TDA
+"""
+
+# ╔═╡ 7c36fb88-b740-40df-a889-9bb571f35693
+Pkg.instantiate()
+
+# ╔═╡ 513ebd63-98b6-41fc-83b0-d0f0b26ce8e0
+using ProgressLogging
+using PersistenceDiagrams
+
+# ╔═╡ 17d6e946-893e-4c73-9037-65a1925fa18d
 begin
-	#l = @layout [a b c]
-	tda_plots = []
-	learner = umap_learner
-	for (i, learner) in enumerate([umap_learner, isomap_learner, ltsa_learner])
-		method = learner.args.method
-		result = get_ripserer_result(learner)
-		p = plot(result, title=nameof(method); infinity=3)
-		append!(tda_plots, p)
+	function manifold_learning_reduce_dim_fn(method)
+		(data; k) -> manifold_learning_reduce_dim_impl(method, data; k)
 	end
-	append!(tda_plots, get_ripserer_result(raw_coil_matrix))
-	#plot(tda_plots..., layout=3)
+
+	function manifold_learning_reduce_dim_impl(method, data; k)
+		args = ManifoldLearnerArgs(method, 2, k)
+		fit_manifold_learner(args, data).reduced_df
+	end
+	
+	function get_wasserstein_distances_for_param_grid(reduce_dim_fn, data, params, diagram_dist=Bottleneck())
+		persistence_diagrams = []
+
+		@progress for p in params
+			append!(persistence_diagrams, get_ripserer_result(reduce_dim_fn(data;p...)))
+		end
+		n_params = length(params)
+		dist_matrix = zeros((n_params, n_params))
+		for i in 1:n_params
+			for j in i:n_params
+				dist_matrix[i,j] = diagram_dist(persistence_diagrams[i], persistence_diagrams[j])
+			end
+		end
+		dist_matrix
+	end
 end
 
-# ╔═╡ 5c15080f-f894-41c0-bf5c-b481cc3a945e
-plot(tda_plots[4])
+# ╔═╡ 87dc1526-c750-49e3-89e2-ac09dc9f4bd1
+function flatten_nonzero_values(m)
+	m_flat = reshape(m, reduce(*, size(m)))
+	[m_v for m_v in m if m_v > 0.0 && isfinite(m_v)]
+end
 
-# ╔═╡ 708f1bb3-fe0f-4265-87a8-ce3d32ad9b03
+# ╔═╡ 459af5b9-fdff-47da-8b45-57c3f0ff1586
 begin
-	plot(tda_plots[1])
+	ks = 5:2:27 |> collect;
+	params = [Dict([(:k, k)]) for k in ks];
+
+	method_wasserstein_dists = []
+	for method in [Isomap, LTSA, UMAP_]
+		reduce_dim_fn = manifold_learning_reduce_dim_fn(method)
+		dists = get_wasserstein_distances_for_param_grid(reduce_dim_fn, coil_matrix, params);
+		push!(method_wasserstein_dists, (string(method), dists))
+	end
 end
 
-# ╔═╡ 6d9d9c33-1d27-4bea-851c-d68b78f1d274
-plot!(tda_plots[2], subplot=2)
-
-# ╔═╡ dadb316c-7d7b-46d1-8e69-491614ead604
-plot!(tda_plots[3], subplot=2)
+# ╔═╡ d4642f47-3985-4d00-8f0d-c135c51e212c
+for (k,d) in method_wasserstein_dists
+	println(k)
+	describe(flatten_nonzero_values(d))
+end
 
 # ╔═╡ Cell order:
 # ╠═c7fdaf8f-5d97-4a71-b478-002d60b9e741
@@ -309,38 +318,35 @@ plot!(tda_plots[3], subplot=2)
 # ╠═f1d371fe-2e0a-423d-9f83-8476a57a44f0
 # ╠═7f901f65-5c90-4485-a7c5-180fe71e9a7e
 # ╠═2de9492f-424c-478b-918e-b282b5f668fa
-# ╠═bf2851b6-9d5a-4a02-a3c9-856823322a54
+# ╠═59f6419d-69d3-40f3-b9a6-8fe6cda2d3f8
 # ╠═d06e5992-3a35-4d9c-82f8-b94c1abb9042
-# ╠═4dd21b66-54d7-470e-9080-1ff40628d716
-# ╠═761adf8a-2bc2-4217-9b7c-6483de01b6df
+# ╠═8f581281-f954-477c-b3ab-237736fee67f
+# ╠═83ff34cc-609b-4628-84f0-ff1ff26e6d9a
 # ╠═fc3b5001-85f9-4494-99fa-df823e184bf2
 # ╠═c50a27e5-d32b-4874-a3b1-f8c6f8434952
-# ╠═b957aea4-77db-4b0e-8126-40d683098a21
 # ╠═d6dda024-56c1-4614-aa7d-ce721e09a0f7
 # ╠═2557d853-06fb-4ffd-8310-f9fc6abe3f47
-# ╠═768f3d06-c291-4543-aa71-0c00b34ae395
-# ╠═fb6b14ee-f5fe-4627-a3aa-6cfc27d1f30a
 # ╠═6ca00b8c-47b9-415a-aa11-cb1631ada099
 # ╠═cbf50c05-5a74-46f7-9af1-82c76005209c
 # ╠═dad24919-c768-463a-a677-dbc415df0bb5
 # ╠═c5b61420-7cfe-4091-82eb-d270c690456a
 # ╠═1d330da1-0acd-49db-bb44-32fe586449f3
-# ╠═1f06cd86-ac38-465b-8958-d635450be118
+# ╠═57587a27-19d3-433a-a29f-12b4df2ceb4e
 # ╠═24b72a9c-9a50-461e-af43-9dd27a9d25d4
-# ╠═3e4eb31e-8a06-4fcf-ba08-3a20f7dacab7
-# ╠═929e6c0e-c9c7-4b28-8a94-2937a797421b
+# ╠═e34f9cba-5234-4c1b-a8d7-78a6c4151540
 # ╠═5d587c26-f0f3-44c7-8c9d-bc2516be03dd
-# ╠═3402f6d0-c41a-4a96-a66c-96263ee7defe
+# ╠═0307bc4e-fb3b-4347-9216-3f8745d1229f
 # ╠═237f7829-fde9-4b24-b024-45bdddb2a278
-# ╠═a3f57b84-a692-43a5-9f32-98943fcdd837
-# ╠═358d0bcc-822a-47c1-ae0c-79feacbd5520
 # ╠═80e6d342-c4d5-4960-a23e-f61c82c8b8ab
 # ╠═f892f93c-196a-47ec-b759-6fd33988c131
-# ╠═d51d8eeb-b268-4bd7-bb07-9c3c6e6ae298
-# ╠═7487066c-b457-40b1-87b4-085482588fcb
+# ╠═0f080f44-b4c3-4928-bbe1-8daca9ffca9e
+# ╠═9e2fa136-8db4-4ef0-97e9-a5345ab03571
 # ╠═3522ed36-038c-4f21-ac45-215ba949dfe8
-# ╠═3fab2f23-3c5c-4885-8bf7-79864b83d09e
-# ╠═5c15080f-f894-41c0-bf5c-b481cc3a945e
-# ╠═708f1bb3-fe0f-4265-87a8-ce3d32ad9b03
-# ╠═6d9d9c33-1d27-4bea-851c-d68b78f1d274
-# ╠═dadb316c-7d7b-46d1-8e69-491614ead604
+# ╠═9fa2e5e9-6f2d-4a53-afac-7b585e658c3c
+# ╠═c0000587-2a64-4687-976a-67efc806c4a4
+# ╠═7c36fb88-b740-40df-a889-9bb571f35693
+# ╠═513ebd63-98b6-41fc-83b0-d0f0b26ce8e0
+# ╠═17d6e946-893e-4c73-9037-65a1925fa18d
+# ╠═87dc1526-c750-49e3-89e2-ac09dc9f4bd1
+# ╠═459af5b9-fdff-47da-8b45-57c3f0ff1586
+# ╠═d4642f47-3985-4d00-8f0d-c135c51e212c
