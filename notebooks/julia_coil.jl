@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.29
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -34,6 +34,12 @@ end
 md"""
 ## Setup
 """
+
+# ╔═╡ 5f72520b-017a-4428-836a-b4665e97fa43
+2 + 2
+
+# ╔═╡ 943ace02-4e25-4474-95a4-500c796daf3e
+
 
 # ╔═╡ 59a31fc2-a9d1-4857-b18e-a2591f4327b0
 md"""
@@ -128,6 +134,17 @@ struct ManifoldLearner
 	reduced_df :: Union{DataFrame, Nothing}
 end
 
+# ╔═╡ d6dda024-56c1-4614-aa7d-ce721e09a0f7
+function fit_manifold_learner(args :: ManifoldLearnerArgs, data)
+	(reducer, reduced_df) = fit_manifold_learner_impl(args.method, args.dim, args.k, data)
+	ManifoldLearner(
+		reducer,
+		args,
+		data,
+		reduced_df
+	)
+end
+
 # ╔═╡ 2557d853-06fb-4ffd-8310-f9fc6abe3f47
 begin 
 	function make_reduced_dataframe(X_reduced)
@@ -154,17 +171,6 @@ ManifoldLearningType = Union{Type{Isomap}, Type{LTSA}}
 function fit_manifold_learner_impl(method :: ManifoldLearningType, dim, k, data)
 	reducer = fit(method, data'; maxoutdim=dim, k=k)
 	(reducer, make_reduced_dataframe(ManifoldLearning.predict(reducer)'))
-end
-
-# ╔═╡ d6dda024-56c1-4614-aa7d-ce721e09a0f7
-function fit_manifold_learner(args :: ManifoldLearnerArgs, data)
-	(reducer, reduced_df) = fit_manifold_learner_impl(args.method, args.dim, args.k, data)
-	ManifoldLearner(
-		reducer,
-		args,
-		data,
-		reduced_df
-	)
 end
 
 # ╔═╡ c5b61420-7cfe-4091-82eb-d270c690456a
@@ -309,6 +315,8 @@ end
 # ╔═╡ Cell order:
 # ╠═c7fdaf8f-5d97-4a71-b478-002d60b9e741
 # ╠═e3e020ac-6aaf-11ee-0d9a-85e0beb5ca6e
+# ╠═5f72520b-017a-4428-836a-b4665e97fa43
+# ╠═943ace02-4e25-4474-95a4-500c796daf3e
 # ╠═59a31fc2-a9d1-4857-b18e-a2591f4327b0
 # ╠═70d7489f-45fc-4677-9fbf-3a6916130530
 # ╠═94c2fb01-09db-4a90-b824-28cac32619cf

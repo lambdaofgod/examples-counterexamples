@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.29
+# v0.19.9
 
 using Markdown
 using InteractiveUtils
@@ -16,9 +16,12 @@ end
 begin 
 	using Ripserer
 	using Plots, PlotThemes
-
+	using Random
 	using Images, FileIO
+	using LinearAlgebra
 	theme(:juno)
+
+	rng = MersenneTwister(42)
 end
 
 # ╔═╡ 10481fbc-6a08-11ee-1c4f-2b0f04f82767
@@ -36,19 +39,20 @@ md"""
 ## Persistent homology with Ripser
 """
 
+# ╔═╡ 3d29a334-cece-4ba4-b38b-ec97eecff935
+
+
 # ╔═╡ 4ae94cd9-2b69-4e22-8dde-67a1a0cb9b4d
 function noisy_circle(n; r1=1, r2=1, noise=0.1)
-    points = NTuple{2,Float64}[]
-    for _ in 1:n
-        θ = 2π * rand()
-        point = (
-            r1 * sin(θ) + noise * rand() - noise / 2,
-            r2 * cos(θ) + noise * rand() - noise / 2,
-        )
-        push!(points, point)
-    end
-    return points
+    X = randn(rng, Float64, (n, 3))
+	points = Tuple{Float64,3}[]
+	for row in eachrow(X)
+		push!(points, Tuple(row))
+	end
 end
+
+# ╔═╡ e22bb3a8-0185-45e6-8824-365eb52c6640
+
 
 # ╔═╡ b95d2a4e-b5d8-4ec3-8baa-23bc7db5beea
 begin
@@ -61,12 +65,16 @@ begin
         aspect_ratio=1,
         xlim=(-2.2, 2.2),
         ylim=(-2.2, 2.2),
+		zlim=(-2.2, 2.2)
         title="Data",
     )
     plt_diag = plot(result; infinity=3)
 
     plot(plt_pts, plt_diag; size=(800, 400))
 end
+
+# ╔═╡ 3f9f4667-4321-4d4e-b6c5-ae30c5d690b5
+
 
 # ╔═╡ fa674ef0-aab6-432b-a5ac-4e3bffa37a80
 md"""
@@ -103,7 +111,7 @@ end
 typeof(images[1])
 
 # ╔═╡ 6070ff3e-6d8d-48eb-86c6-a96623f74014
-
+1 + 2
 
 # ╔═╡ d2c84a1e-c7ad-4178-a6dd-b59d70385da9
 images[1] - 1
@@ -120,14 +128,45 @@ ceil((images[1] + images[2]) / 2)
 # ╔═╡ cdc1ca21-3568-4f08-b144-cc79a77f72a1
 
 
+# ╔═╡ 1f5ba155-abbc-4f1a-b5fa-a0051f89dbd4
+begin
+	points = noisy_circle(100; noise=0)
+    result = ripserer(points)
+
+    plt_pts = scatter(
+        points;
+        legend=false,
+        aspect_ratio=1,
+        xlim=(-2.2, 2.2),
+        ylim=(-2.2, 2.2),
+		zlim=(-2.2, 2.2),
+        title="Data",
+    )
+    plt_diag = plot(result; infinity=3)
+
+    plot(plt_pts, plt_diag; size=(800, 400))
+end
+
+# ╔═╡ 81a5a99b-dc3d-4643-a256-f83f0c0874a2
+begin
+	X = randn(rng, Float64, (n, 3))
+	points = Tuple{Float64,3}[]
+	points
+end
+
 # ╔═╡ Cell order:
 # ╠═10481fbc-6a08-11ee-1c4f-2b0f04f82767
 # ╠═6078059a-176d-4e95-92b8-7b39bdeff7cb
 # ╠═ec68f1f5-13ad-450f-8bd4-cfb15adb0e6c
 # ╠═b3ed9787-f333-4d4a-96e5-56a6541201fe
 # ╠═33fc86a7-f9ef-4ace-8593-54d1a7eeb4b9
+# ╠═81a5a99b-dc3d-4643-a256-f83f0c0874a2
+# ╠═3d29a334-cece-4ba4-b38b-ec97eecff935
 # ╠═4ae94cd9-2b69-4e22-8dde-67a1a0cb9b4d
+# ╠═e22bb3a8-0185-45e6-8824-365eb52c6640
+# ╠═1f5ba155-abbc-4f1a-b5fa-a0051f89dbd4
 # ╠═b95d2a4e-b5d8-4ec3-8baa-23bc7db5beea
+# ╠═3f9f4667-4321-4d4e-b6c5-ae30c5d690b5
 # ╠═fa674ef0-aab6-432b-a5ac-4e3bffa37a80
 # ╠═4adadda3-9459-4122-9417-917bd32e73f9
 # ╠═e4467766-25f7-44f7-b028-33ff8aac7306

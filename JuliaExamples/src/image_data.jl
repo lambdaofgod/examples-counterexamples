@@ -14,11 +14,11 @@ end
 
 function load_dataset(root)
     files = map(x->joinpath(root, x), readdir(root))
-    return mappedarray(p -> load_image(p), files)
+    mappedarray(p -> load_image(p), files)
 end
 
 function images_dataset_to_vectors_dataset(img_dataset, img_size=(32,32))
 	img_flat_size = img_size[1] * img_size[2]
-	resized_img_coil_dataset = map(img -> imresize(img, img_size), img_dataset)
-	map(img -> real.(reshape(float(img), img_flat_size)), resized_img_coil_dataset)
+	resized_img_coil_dataset = mappedarray(img -> imresize(img, img_size), img_dataset)
+	mappedarray(img -> real.(reshape(float(img), img_flat_size)), resized_img_coil_dataset)
 end
