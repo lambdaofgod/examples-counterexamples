@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "examples-counterexamples"
+version = "0.1.0"
+description = ""
+authors = ["Jakub 'lambdaofgod' Bartczuk <bartczukkuba@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+dowhy = "^0.11"
+pgmpy = "^0.1.24"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.27.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
